@@ -11,6 +11,11 @@ def radius(vr, w=rWidth):
     return (w*4)/(vr-8)
 
 
+def theta_from_vr(vr, w=rWidth):
+    # theta. = (vr - vl) / w
+    return (vr - vl_from_vr(vr)) / w
+
+
 def vl_from_vr(vr, v=avgVel):
     # (vl + vr)/2 = v
     # vl = 2v - vr
@@ -27,7 +32,7 @@ def partA():
     steps = int(turn_time / dt)
     for i in range(steps):
         vr = i*((diameter / 2) / turn_time)
-        print("Velocites: " + str(vl_from_vr(vr)) + ", " + str(vr) + "\n Radius of turn: " + str(radius(vr)))
+        print("Velocites: " + str(vl_from_vr(vr)) + ", " + str(vr) + "\n Radius of turn: " + str(radius(vr)) + "\n Theta: " + str(theta_from_vr(vr)))
 
 
 # def partB():
