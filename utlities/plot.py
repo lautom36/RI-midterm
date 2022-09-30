@@ -1,5 +1,6 @@
 import matplotlib.pyplot as plt
 
+
 def plot(x, y, xName = 'x - axis', yName = 'y - axis', plotName = 'plot'):
     # plot points
     plt.plot(x,y)

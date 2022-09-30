@@ -4,6 +4,7 @@ from cmath import cos, sin, sqrt, pi
 def dist(x1, y1, x2=0, y2=0):
     return sqrt(abs(x1-x2)**2 + abs(y1-y2)**2).real
 
+
 def f_kinematics(vLeft, vRight, x0, y0, theta0, w, dt=0.1):
     xNow = x0 - 1.0/2.0 * (vRight + vLeft) * sin(theta0).real * dt
     yNow = y0 + 1.0/2.0 * (vRight + vLeft) * cos(theta0).real * dt
