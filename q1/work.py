@@ -6,13 +6,15 @@ rWidth = .55  # 55 cm
 avgVel = 8
 
 
-def radius(vr):
-    # R(vr) = 2.2/(vr-8)
-    return 2.2/(vr-8)
+def radius(vr, w=rWidth):
+    # R(vr) = (w*4)/(vr-8)
+    return (w*4)/(vr-8)
 
 
-def vl_from_vr(vr):
-    return 16 - vr
+def vl_from_vr(vr, v=avgVel):
+    # (vl + vr)/2 = v
+    # vl = 2v - vr
+    return (2*v) - vr
 
 
 def partA():
@@ -26,7 +28,6 @@ def partA():
     for i in range(steps):
         vr = i*((diameter / 2) / turn_time)
         print("Velocites: " + str(vl_from_vr(vr)) + ", " + str(vr) + "\n Radius of turn: " + str(radius(vr)))
-
 
 
 # def partB():
