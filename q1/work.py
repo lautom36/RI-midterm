@@ -167,70 +167,138 @@ def findLocationAngle(circum, totalDist):
 def distance(x1, x2, y1, y2):
     return math.sqrt((x2-x1)**2 + (y2-y1)**2)
 
-def partCHelper(dt):
+# def partCHelper(dt):
+#     circumference = 5 * math.pi
+#     totalDist = 0
+#     xAct, yAct = [2.5], [0]
+#     totalError = 0
+#     errors = []
+#     times= []
+#     currTime = 0.0
+
+#     # start at edge of circle
+#     xs, ys, thetas = [2.5], [0], [0]
+#     L = rLength
+#     vrw = avgVel
+
+#     currX = 2.5
+#     currY = 0
+#     currTheta = 0
+
+#     # go around cirlce
+#     alpha = math.radians(16.7)
+#     for i in range(int(10 / dt)):
+#         x, y, theta = acerman(currX, currY, currTheta, alpha, vrw, L, dt)
+#         currX, currY, currTheta = x, y, theta
+#         xs.append(x)
+#         ys.append(y)
+#         thetas.append(theta)
+
+#         # find x, y, and theta actual
+#         totalDist += vrw * dt
+#         locAngle = findLocationAngle(circumference, totalDist)
+#         xActual, yActual = findXYFromLocationAngle(locAngle, totalDist)
+#         xAct.append(xActual)
+#         yAct.append(yActual)
+
+#         currTime = float(i * dt)
+
+#         if(currTime.is_integer()):
+#             totalError += distance(x, xActual, y, yActual)
+#             errors.append(totalError)
+#             times.append(i*dt)
+
+#     return times, errors
+
+def forwardEuler(dt, alpha, vrw, L, startX = 0, startY = 0, startTheta = 0):
+    T = dt
+    x, y, theta = startX, startY, startTheta
+    xs = [2.5]
+    ys = [0]
+    thetas = [0]
+
+    xReturn = [0]
+    yReturn = [0]
+    for k in range(1,10):
+        for i in range(int(1 / dt)):
+            xNew = xs[-1] - T * vrw * math.sin(thetas[-1])
+            yNew = ys[-1] + T * vrw * math.cos(thetas[-1])
+            thetaNew = thetas[-1] + T * (vrw / L ) * math.tan(alpha) 
+            x, y, theta = xNew, yNew, thetaNew
+            xs.append(x)
+            ys.append(y)
+            thetas.append(theta)
+        xReturn.append(x)
+        yReturn.append(y)
+
+    # plotWithCircle(xs, ys, 2.5)
+
+    return xReturn, yReturn
+
+def findActual(dt, vrw):
+    xAct, yAct = [0], [0]
     circumference = 5 * math.pi
     totalDist = 0
-    xAct, yAct = [2.5], [0]
-    totalError = 0
-    errors = []
-    times= []
-    currTime = 0.0
 
-    # start at edge of circle
-    xs, ys, thetas = [2.5], [0], [0]
-    L = rLength
-    vrw = avgVel
-
-    currX = 2.5
-    currY = 0
-    currTheta = 0
-
-    # go around cirlce
-    alpha = math.radians(16.7)
-    for i in range(int(10 / dt)):
-        x, y, theta = acerman(currX, currY, currTheta, alpha, vrw, L, dt)
-        currX, currY, currTheta = x, y, theta
-        xs.append(x)
-        ys.append(y)
-        thetas.append(theta)
-
-        # find x, y, and theta actual
-        totalDist += vrw * dt
+    for k in range(1, 10):
+        for i in range(int(1 / dt)):
+            totalDist += vrw * dt
         locAngle = findLocationAngle(circumference, totalDist)
         xActual, yActual = findXYFromLocationAngle(locAngle, totalDist)
         xAct.append(xActual)
         yAct.append(yActual)
+    return xAct, yAct
 
-        currTime = float(i * dt)
-
-        if(currTime.is_integer()):
-            totalError += distance(x, xActual, y, yActual)
-            errors.append(totalError)
-            times.append(i*dt)
-
-    return times, errors
-
+def findError(xRobot, yRobot, xActual, yActual, dt):
+    errors = []
+    times = []
+    totalError = 0
+    for i in range(len(xRobot)):
+        totalError += distance(xRobot[i], xActual[i], yRobot[i], yActual[i])
+        errors.append(totalError)
+        times.append(i*dt)
+    return errors, times
 
 def partC():
-    times1, errors1 = partCHelper(1)
-    times2, errors2 = partCHelper(.1)
-    times3, errors3 = partCHelper(.01)
+    dt = 1
+    xRobot, yRobot = forwardEuler(dt, math.radians(16.7), 8, rLength)
+    xActual, yActual = findActual(dt, 8)
+    print(str(len(xRobot)) + " " + str(len(xActual)))
+    errors1, times1 = findError(xRobot, yRobot, xActual, yActual, dt)
+    print(len(errors1))
 
-    plt.plot(times1,errors1, label="dt=1")
-    plt.plot(times2,errors2, label="dt=.1")
-    plt.plot(times3,errors3, label="dt=.01")
+    dt = .1
+    xRobot, yRobot = forwardEuler(dt, math.radians(16.7), 8, rLength)
+    xActual, yActual = findActual(dt, 8)
+    print(str(len(xRobot)) + " " + str(len(xActual)))
+    errors2, times2 = findError(xRobot, yRobot, xActual, yActual, dt)
+    print(len(errors2))
+
+    dt = .01
+    xRobot, yRobot = forwardEuler(dt, math.radians(16.7), 8, rLength)
+    xActual, yActual = findActual(dt, 8)
+    print(str(len(xRobot)) + " " + str(len(xActual)))
+    errors3, times3 = findError(xRobot, yRobot, xActual, yActual, dt)
+    print(len(errors3))
+
+    plt.plot(times1,errors1, label="dt = 1")
+    plt.plot(times2, errors2, label="dt = .1")
+    plt.plot(times3, errors3,label="dt = .01")
 
     # rename axises
-    plt.xlabel('time')
+    plt.xlabel("time")
     plt.ylabel("error")
 
     # set graph title
-    plt.title('')
-
+    plt.title("")
     plt.legend()
 
     # show graph
     plt.show()
+
+
+
+
 
 # partA()
 # partB(1000)
