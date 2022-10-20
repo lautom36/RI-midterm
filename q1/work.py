@@ -172,6 +172,9 @@ def partCHelper(dt):
     totalDist = 0
     xAct, yAct = [2.5], [0]
     totalError = 0
+    errors = []
+    times= []
+    currTime = 0.0
 
     # start at edge of circle
     xs, ys, thetas = [2.5], [0], [0]
@@ -184,7 +187,7 @@ def partCHelper(dt):
 
     # go around cirlce
     alpha = math.radians(16.7)
-    for i in range(int(1 / dt)):
+    for i in range(int(10 / dt)):
         x, y, theta = acerman(currX, currY, currTheta, alpha, vrw, L, dt)
         currX, currY, currTheta = x, y, theta
         xs.append(x)
@@ -198,15 +201,36 @@ def partCHelper(dt):
         xAct.append(xActual)
         yAct.append(yActual)
 
-        totalError += distance(x, xActual, y, yActual)
-        print(totalError)
+        currTime = float(i * dt)
 
-    print(totalError)
-    plotWithCircle(xs, ys, 2.5)
+        if(currTime.is_integer()):
+            totalError += distance(x, xActual, y, yActual)
+            errors.append(totalError)
+            times.append(i*dt)
+
+    return times, errors
 
 
 def partC():
-    partCHelper(.01)
+    times1, errors1 = partCHelper(1)
+    times2, errors2 = partCHelper(.1)
+    times3, errors3 = partCHelper(.01)
+
+    plt.plot(times1,errors1, label="dt=1")
+    plt.plot(times2,errors2, label="dt=.1")
+    plt.plot(times3,errors3, label="dt=.01")
+
+    # rename axises
+    plt.xlabel('time')
+    plt.ylabel("error")
+
+    # set graph title
+    plt.title('')
+
+    plt.legend()
+
+    # show graph
+    plt.show()
 
 # partA()
 # partB(1000)
