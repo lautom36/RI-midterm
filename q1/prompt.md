@@ -11,8 +11,14 @@ run a few simple experiments with it. Please upload your resulting figures and p
 
 (b) (5 points) Do the same as the above for a traditional car (Ackermann steering).
 
-(c) (10 points) If the car is traveling for 10s, what is my position error using the dis-
-    cretized equations of motion if I define my time steps at ∆t = 1,0.1,0.01 ? Plot
-    the errors and computing time for the Ackermann vehicle in these cases. Use the
-    forward Euler approach and compute a total error based on the distance difference
-    from the analytical circle to the discrete-time equations.
+(c) (10 points) Your Ackermann vehicle (with the same dimensions as described for the
+    skid steer), is driving on a circle of radius 2.5m. Assume that you begin on the edge
+    of the circle. Calculate the positional error with our computational approximation
+    using the forward Euler method, as referred to in the course notes and illustrated
+    in Reading 2, eq. 1.6. Graph the errors and computing time for three different
+    time-steps (∆t = 1,0.1,0.01), error is defined as the absolute distance between the
+    expected (from equations) to real x,y position (defined analytically) over time.
+    Brief notes on what this problem is about: Imagine that you are moving a semi-truck
+    and you have GPS positions (somewhat accurate) and an internal prediction model.
+    We want the internal models to be updated based on ”ground truth” information
+    to build better estimates of the vehicle motion over time.
