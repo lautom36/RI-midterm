@@ -1,10 +1,54 @@
 
+from cProfile import label
 import math
-from utilities.plot import plot
+import matplotlib.pyplot as plt
+
+
+def plot(x, y, xName = 'x - axis', yName = 'y - axis', plotName = 'plot'):
+    # plot points
+    plt.plot(x,y)
+
+    # rename axises
+    plt.xlabel(xName)
+    plt.ylabel(yName)
+
+    # set graph title
+    plt.title(plotName)
+
+    # show graph
+    plt.show()
+
+def plotWithCircle(x, y, radius, xName = 'x - axis', yName = 'y - axis', plotName = 'plot'):
+    fig=plt.figure()
+    ax=fig.add_subplot()
+        # plot points
+    plt.plot(x,y, label = "Robot Path")
+
+    circle = plt.Circle((0,0), radius, fill= False, label = "circle")
+    centreSpot = plt.Circle((0,0),0.05,color="black")
+    ax.add_patch(circle)
+    ax.add_patch(centreSpot)
+
+    # circle2 = plt.Circle((-1.25,0), radius/2, fill= False, label = "circle")
+    # centreSpot2 = plt.Circle((-1.25,0),0.05,color="black")
+    # ax.add_patch(circle2)
+    # ax.add_patch(centreSpot2)
+
+    # rename axises
+    plt.xlabel(xName)
+    plt.ylabel(yName)
+
+    # set graph title
+    plt.title(plotName)
+    plt.legend()
+
+    # show graph
+    plt.show()
 
 # global constants
 rLength = .75  # 75 cm
 rWidth = .55  # 55 cm
+
 
 avgVel = 8
 
@@ -49,20 +93,6 @@ def partA():
     # Traverse to edge of circle
     turn_time = 3  # seconds
     steps = int(turn_time / dt)
-def partA():
-    # circle diameter of 5m
-    # start at (0,0)
-    # constant velocity of 8m/s
-    dt = .1
-    diameter = 5
-    times = [0]
-    xs = [0]
-    ys = [0]
-    thetas = [0]
-
-    # Traverse to edge of circle
-    turn_time = 3  # seconds
-    steps = int(turn_time / dt)
     for i in range(5):
         dist_to_dia = math.sqrt(xs[-1]**2 + ys[-1]**2)
         vr = ((diameter / 2) - dist_to_dia) / turn_time
@@ -91,9 +121,9 @@ def acerman(x0, y0, theta0, alpha, vrw, L, dt=.1):
 def degToRad(theta):
     return (theta * (math.pi/180))
 
-def partB():
+def partB(dtMulti = 1):
+    dt = .1 / dtMulti
     xs, ys, thetas = [0], [0], [0]
-    alpha = math.radians(10)
     L = rLength
     vrw = avgVel
 
@@ -101,18 +131,83 @@ def partB():
     currY = 0
     currTheta = 0
 
-    for i in range(15):
-        x, y, theta = acerman(currX, currY, currTheta, alpha, vrw, L,)
+    alpha = math.radians(30.96)
+    # get to edge of circle
+    for i in range(5 * dtMulti):
+        x, y, theta = acerman(currX, currY, currTheta, alpha, vrw, L, dt)
         currX, currY, currTheta = x, y, theta
         xs.append(x)
         ys.append(y)
         thetas.append(theta)
-        print("x: " + str(x) + " y: " + str(y) + " theta: " + str(theta))
+        print("x: " + str(x) + " y: " + str(y) + " theta: " + str(math.degrees(theta)))
 
-    print(.3246 + (-8) * math.sin(5.225) * .1)
+    # go around cirlce
+    alpha = math.radians(16.7)
+    for i in range(20 * dtMulti):
+        x, y, theta = acerman(currX, currY, currTheta, alpha, vrw, L, dt)
+        currX, currY, currTheta = x, y, theta
+        xs.append(x)
+        ys.append(y)
+        thetas.append(theta)
+
+    # print(.3246 + (-8) * math.sin(5.225) * .1)
+    # plotWithCircle(xs, ys, 2.5)
     plot(xs, ys)
-# def partC():
 
-partA()
-# partB()
-# partC()
+dtMulti = 1
+
+def findXYFromLocationAngle(theta ,totalDist):
+    y = math.sin(theta) * totalDist
+    x = math.cos(theta) * totalDist
+    return x, y
+
+def findLocationAngle(circum, totalDist):
+    return (totalDist / circum) * 360
+
+def distance(x1, x2, y1, y2):
+    return math.sqrt((x2-x1)**2 + (y2-y1)**2)
+
+def partCHelper(dt):
+    circumference = 5 * math.pi
+    totalDist = 0
+    xAct, yAct = [2.5], [0]
+    totalError = 0
+
+    # start at edge of circle
+    xs, ys, thetas = [2.5], [0], [0]
+    L = rLength
+    vrw = avgVel
+
+    currX = 2.5
+    currY = 0
+    currTheta = 0
+
+    # go around cirlce
+    alpha = math.radians(16.7)
+    for i in range(int(1 / dt)):
+        x, y, theta = acerman(currX, currY, currTheta, alpha, vrw, L, dt)
+        currX, currY, currTheta = x, y, theta
+        xs.append(x)
+        ys.append(y)
+        thetas.append(theta)
+
+        # find x, y, and theta actual
+        totalDist += vrw * dt
+        locAngle = findLocationAngle(circumference, totalDist)
+        xActual, yActual = findXYFromLocationAngle(locAngle, totalDist)
+        xAct.append(xActual)
+        yAct.append(yActual)
+
+        totalError += distance(x, xActual, y, yActual)
+        print(totalError)
+
+    print(totalError)
+    plotWithCircle(xs, ys, 2.5)
+
+
+def partC():
+    partCHelper(.01)
+
+# partA()
+# partB(1000)
+partC()
