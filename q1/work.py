@@ -256,30 +256,30 @@ def findError(xRobot, yRobot, xActual, yActual, dt):
     for i in range(len(xRobot)):
         totalError += distance(xRobot[i], xActual[i], yRobot[i], yActual[i])
         errors.append(totalError)
-        times.append(i*dt)
+        times.append(i)
     return errors, times
 
 def partC():
     dt = 1
     xRobot, yRobot = forwardEuler(dt, math.radians(16.7), 8, rLength)
     xActual, yActual = findActual(dt, 8)
-    print(str(len(xRobot)) + " " + str(len(xActual)))
+    # print(str(len(xRobot)) + " " + str(len(xActual)))
     errors1, times1 = findError(xRobot, yRobot, xActual, yActual, dt)
-    print(len(errors1))
+    # print(len(errors1))
 
     dt = .1
     xRobot, yRobot = forwardEuler(dt, math.radians(16.7), 8, rLength)
     xActual, yActual = findActual(dt, 8)
-    print(str(len(xRobot)) + " " + str(len(xActual)))
+    # print(str(len(xRobot)) + " " + str(len(xActual)))
     errors2, times2 = findError(xRobot, yRobot, xActual, yActual, dt)
-    print(len(errors2))
+    # print(len(errors2))
 
     dt = .01
     xRobot, yRobot = forwardEuler(dt, math.radians(16.7), 8, rLength)
     xActual, yActual = findActual(dt, 8)
-    print(str(len(xRobot)) + " " + str(len(xActual)))
+    # print(str(len(xRobot)) + " " + str(len(xActual)))
     errors3, times3 = findError(xRobot, yRobot, xActual, yActual, dt)
-    print(len(errors3))
+    # print(len(errors3))
 
     plt.plot(times1,errors1, label="dt = 1")
     plt.plot(times2, errors2, label="dt = .1")
