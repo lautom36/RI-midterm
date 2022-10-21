@@ -268,8 +268,6 @@ def partC():
 
 # end part c
 
-
-
 partA()
 partB()
 partC()
