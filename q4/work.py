@@ -1,13 +1,18 @@
-# global constants
 from math import cos, radians, sin
 
 
+# global constants
 m = .2 # kg mass of weight
 l = 1.0
 M = 4.0 # kg mass of cart
 
 def partA ():
   print('starting partA')
+  """
+  The acceleration of theta is bassed on the mass ratio
+
+  Acceleration of x is based on force plus theta velocity - the angular forces of the weight
+  """
 
 def getForce(xAccel, thetaAccel, theta, thetaVel):
   return (M + m) * xAccel - m * l * thetaAccel * cos(theta) + m * l * thetaVel ** 2 * sin(theta)
@@ -43,10 +48,7 @@ def partB():
   thetaVel = .5
 
   while (not done):
-    # theta = getTheta() # assuming we can use robot sensors
-    time += dt
-    # if pole is leaning to the left
-    
+    time += dt    
     action = 0
     if (theta > 0 and theta < radians(90)):
       # exert force in the -x direction
@@ -71,3 +73,12 @@ def partB():
 
 def partC():
   print('starting partC')
+  print('The maximum angle is about 32 degrees')
+  thetaVel = 0
+
+  # check each angle from 1 to 90, when x > 1 it is beyond recovery
+  for i in range(1, 91):
+    x = getThetaAccel(6, 9.8, radians(i), thetaVel)
+    print('angle: ' + str(i) + ' Accel: ' + str(x))
+
+partC()
