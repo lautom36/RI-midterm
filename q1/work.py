@@ -196,10 +196,9 @@ def findActual(dt, vrw):
 def findError(xRobot, yRobot, xActual, yActual, dt):
     errors = []
     times = []
-    totalError = 0
     for i in range(len(xRobot)):
-        totalError += distance(xRobot[i], xActual[i], yRobot[i], yActual[i])
-        errors.append(totalError)
+        error = distance(xRobot[i], xActual[i], yRobot[i], yActual[i])
+        errors.append(error)
         times.append(i)
     return errors, times
 
@@ -268,6 +267,6 @@ def partC():
 
 # end part c
 
-partA()
-partB()
+# partA()
+# partB()
 partC()
