@@ -1,5 +1,27 @@
-from locale import currency
+def partA():
+  """
+  Merits: Dosent require hand labeled training data,
+          Can be used in conjuction with other technologies,
+          Can correct errors while training
 
+  Demerits: Have to have a well tuned reward function,
+            Needs alot of time to train,
+            If you are using reinforcement learning with a physical model
+              and something goes wrong you could break an expensive part
+  """
+
+def partB():
+  """
+  Drawn diagrams are in this folder under the name diagrams.jpg
+
+  In a pid controller you have three parameters to tune that will change the way you converge, but
+  In reinforcement learning you have a reward function to tune that then tunes all the other parameters
+  by its self which allows it to learn and improve itself. Another interesting difference is that controls
+  explit the knowledge that we have about the model, but reinforcement learning doesnt make any assumptions
+  about the model.
+
+
+  """
 
 def partC():
   # imports
