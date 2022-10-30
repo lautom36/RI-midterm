@@ -53,12 +53,12 @@ def partB():
     if (theta > 0 and theta < radians(90)):
       # exert force in the -x direction
       # vel = -6 * theta # as theta gets bigger the velocity increases
-      action = -1
+      action = -1 * (theta / 90)
 
     elif (theta > radians(270) and theta < radians(360)):
       # exert force in the +x direction 
       # vel = 6 * (radians(360) - theta) # as the theta gets closer to 360 the velocity decreases
-      action = 1
+      action = 1 * ((360 - theta) / 90)
 
     else:
       # could replace with steps to get weight above critical point
