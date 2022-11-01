@@ -1,3 +1,5 @@
 .idea/
 .vs/
 *.bak
+__pycache__/
+q8/yolov3.weights
