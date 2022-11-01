@@ -27,36 +27,36 @@ Read in the classification classes and create an array <data> which consists of 
 in <path>/data
 """
 def read_data(path=data_path, data=[], sample_size=10):
-	classesf = open(path + "/../classes.txt")
-	for line in classesf:
-		classes.append(line.strip())
-
-	files = os.listdir(data_path + "/data")
-	for i in range(sample_size):
-		dat = dict()
-		dat["annotations"] = None
-		if files[i*2-1].endswith(".jpeg"):
-			dat["file_name"] = data_path + "/data/" + files[i*2-1]
-			imTxt = open(data_path + "/data/" + files[i*2], mode='r').readline().strip()
-		elif files[i*2-1].endswith(".txt"):
-			dat["file_name"] = data_path + "/data/" + files[i*2]
-			imTxt = open(data_path + "/data/" + files[i*2-1], mode='r').readline().strip()
-		else:
-			print("Got bad file extension")
-			continue
-		im = cv.imread(dat["file_name"])
-		# imBBox = [int(float(imTxt.split(' ')[1])*len(im)),
-		# 		  int(float(imTxt.split(' ')[2])*len(im[0])),
-		# 		  int(float(imTxt.split(' ')[3]) * len(im)),
-		# 		  int(float(imTxt.split(' ')[4]) * len(im[0]))]
-		# dat["height"] = len(im[0])
-		# dat["width"] = len(im)
-		# dat["image_id"] = dat["file_name"]
-		# dat["annotations"] = [dict({"bbox": imBBox,
-		# 							"bbox_mode": BoxMode.XYWH_ABS,
-		# 							"category_id": 0})]
-		data.append(dat)
-	return data
+	# classesf = open(path + "/../classes.txt")
+	# for line in classesf:
+	# 	classes.append(line.strip())
+	#
+	# files = os.listdir(data_path + "/data")
+	# for i in range(sample_size):
+	# 	dat = dict()
+	# 	dat["annotations"] = None
+	# 	if files[i*2-1].endswith(".jpeg"):
+	# 		dat["file_name"] = data_path + "/data/" + files[i*2-1]
+	# 		imTxt = open(data_path + "/data/" + files[i*2], mode='r').readline().strip()
+	# 	elif files[i*2-1].endswith(".txt"):
+	# 		dat["file_name"] = data_path + "/data/" + files[i*2]
+	# 		imTxt = open(data_path + "/data/" + files[i*2-1], mode='r').readline().strip()
+	# 	else:
+	# 		print("Got bad file extension")
+	# 		continue
+	# 	im = cv.imread(dat["file_name"])
+	# 	imBBox = [int(float(imTxt.split(' ')[1])*len(im)),
+	# 			  int(float(imTxt.split(' ')[2])*len(im[0])),
+	# 			  int(float(imTxt.split(' ')[3]) * len(im)),
+	# 			  int(float(imTxt.split(' ')[4]) * len(im[0]))]
+	# 	dat["height"] = len(im[0])
+	# 	dat["width"] = len(im)
+	# 	dat["image_id"] = dat["file_name"]
+	# 	dat["annotations"] = [dict({"bbox": imBBox,
+	# 								"bbox_mode": BoxMode.XYWH_ABS,
+	# 								"category_id": 0})]
+	# 	data.append(dat)
+	# return data
 
 
 """
@@ -66,11 +66,11 @@ https://colab.research.google.com/drive/16jcaJoc6bCFAQ96jDe2HwtXj7BMD_-m5#scroll
 """
 def detectron2(data, classes=classes):
 	dataset = DatasetFromList(data)
-	# for d in dataset:
-	# 	img = cv.imread(d["file_name"])
-	# 	visualizer = Visualizer(img[:, :, :-1], scale=0.5)
-	# 	out = visualizer.draw_dataset_dict(d)
-	# 	cv.imshow('window', out.get_image()[:, :, ::-1])
+	for d in dataset:
+		img = cv.imread(d["file_name"])
+		visualizer = Visualizer(img[:, :, :-1], scale=0.5)
+		out = visualizer.draw_dataset_dict(d)
+		cv.imshow('window', out.get_image()[:, :, ::-1])
 
 
 """
@@ -162,7 +162,7 @@ Classification technique used in (a)
 Follows Tensorflow tutorial:
 https://www.tensorflow.org/tutorials/images/classification
 """
-def tensorflow(data, classes=classes):
+def tensorflow():
 	data_dir = tf.keras.utils.image_dataset_from_directory(os.getcwd().replace("\\", "/") + "/" + data_path + "/data") #.get_file('agri', origin="https://www.kaggle.com/datasets/ravirajsinh45/crop-and-weed-detection-data-with-bounding-boxes/download", untar=True)  # "file:///" + os.getcwd().replace("\\", "/") + "/" + data_path + "/data")
 	#data_dir = pathlib.Path(data_dir)
 	#image_count = len(list(data_dir.glob('*.jpeg')))
@@ -231,11 +231,11 @@ data = read_data()
 
 
 # (a): Tensorflow Image Classification technique
-tensorflow(data)
+tensorflow()
 
 # (b): YOLO Classification technique
 #yolo(data)
 
 
 # (c): Transfer learning on new object class
-detectron2(data)
+#detectron2(data)
