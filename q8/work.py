@@ -4,15 +4,18 @@ import detectron2
 from detectron2.data import DatasetFromList
 from detectron2.utils.visualizer import Visualizer
 from detectron2.structures import BoxMode
-import keras
 import numpy as np
 import os
 import pandas as pd
+import pathlib
+import PIL
 import sklearn as sk
-import tensorflow
+import tensorflow as tf
 import time
+from tensorflow import keras
+from tensorflow.keras import layers
+from tensorflow.keras.models import Sequential
 
-from q8.ImageDataInfo import ImageDataInfo
 
 data = []
 data_path = "data/agri_data"
@@ -57,7 +60,7 @@ def read_data(path=data_path, data=[], sample_size=10):
 
 
 """
-Classification technique used in (a).
+Classification technique used in (c).
 Follows tutorial here:
 https://colab.research.google.com/drive/16jcaJoc6bCFAQ96jDe2HwtXj7BMD_-m5#scrollTo=0d288Z2mF5dC
 """
@@ -155,23 +158,82 @@ def yolo(data, classes=classes):
 
 
 """
-Classification technique used in (c)
+Classification technique used in (a)
+Follows Tensorflow tutorial:
+https://www.tensorflow.org/tutorials/images/classification
 """
-def technique2_TBD():
-	pass
+def tensorflow(data, classes=classes):
+	data_dir = tf.keras.utils.image_dataset_from_directory(os.getcwd().replace("\\", "/") + "/" + data_path + "/data") #.get_file('agri', origin="https://www.kaggle.com/datasets/ravirajsinh45/crop-and-weed-detection-data-with-bounding-boxes/download", untar=True)  # "file:///" + os.getcwd().replace("\\", "/") + "/" + data_path + "/data")
+	data_dir = pathlib.Path(data_dir)
+	image_count = len(list(data_dir.glob('*.jpeg')))
+
+	train_ds = tf.keras.utils.image_dataset_from_directory(
+		data_dir,
+		validation_split=0.2,
+		subset="training",
+		seed=123,
+		image_size=(512, 512),
+		batch_size=10)
+	val_ds = tf.keras.utils.image_dataset_from_directory(
+		data_dir,
+		validation_split=0.2,
+		subset="validation",
+		seed=123,
+		image_size=(512, 512),
+		batch_size=10)
+	train_ds.class_names = classes
+
+	AUTOTUNE = tf.data.AUTOTUNE
+	train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
+	val_ds = val_ds.cache().prefetch(buffer_size=AUTOTUNE)
+
+	normalization_layer = layers.Rescaling(1. / 255)
+	normalized_ds = train_ds.map(lambda x, y: (normalization_layer(x), y))
+	image_batch, labels_batch = next(iter(normalized_ds))
+	model = Sequential([
+		layers.Rescaling(1. / 255, input_shape=(512, 512, 3)),
+		layers.Conv2D(16, 3, padding='same', activation='relu'),
+		layers.MaxPooling2D(),
+		layers.Conv2D(32, 3, padding='same', activation='relu'),
+		layers.MaxPooling2D(),
+		layers.Conv2D(64, 3, padding='same', activation='relu'),
+		layers.MaxPooling2D(),
+		layers.Flatten(),
+		layers.Dense(128, activation='relu'),
+		layers.Dense(len(classes))
+	])
+
+	model.compile(optimizer='adam',
+				  loss=tf.keras.losses.SparseCategoricalCrossentropy(from_logits=True),
+				  metrics=['accuracy'])
+	model.summary()
+
+	epochs = 10
+	history = model.fit(
+		train_ds,
+		validation_data=val_ds,
+		epochs=epochs
+	)
+
+	img = tf.keras.utils.load_img(os.getcwd() + "\\" + data_path + "\\predict", target_size=(512, 512))
+	img_array = tf.keras.utils.img_to_array(img)
+	img_array = tf.expand_dims(img_array, 0)  # Create a batch
+
+	predictions = model.predict(img_array)
+	score = tf.nn.softmax(predictions[0])
+	print(score)
 
 
 # Preliminary
 data = read_data()
 
 
-# (a): Faster RCNN Image Classification technique
-detectron2(data)
-
+# (a): Tensorflow Image Classification technique
+tensorflow(data)
 
 # (b): YOLO Classification technique
 #yolo(data)
 
 
 # (c): Transfer learning on new object class
-technique2_TBD()
+detectron2(data)
