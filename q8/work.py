@@ -45,16 +45,16 @@ def read_data(path=data_path, data=[], sample_size=10):
 			print("Got bad file extension")
 			continue
 		im = cv.imread(dat["file_name"])
-		imBBox = [int(float(imTxt.split(' ')[1])*len(im)),
-				  int(float(imTxt.split(' ')[2])*len(im[0])),
-				  int(float(imTxt.split(' ')[3]) * len(im)),
-				  int(float(imTxt.split(' ')[4]) * len(im[0]))]
-		dat["height"] = len(im[0])
-		dat["width"] = len(im)
-		dat["image_id"] = dat["file_name"]
-		dat["annotations"] = [dict({"bbox": imBBox,
-									"bbox_mode": BoxMode.XYWH_ABS,
-									"category_id": 0})]
+		# imBBox = [int(float(imTxt.split(' ')[1])*len(im)),
+		# 		  int(float(imTxt.split(' ')[2])*len(im[0])),
+		# 		  int(float(imTxt.split(' ')[3]) * len(im)),
+		# 		  int(float(imTxt.split(' ')[4]) * len(im[0]))]
+		# dat["height"] = len(im[0])
+		# dat["width"] = len(im)
+		# dat["image_id"] = dat["file_name"]
+		# dat["annotations"] = [dict({"bbox": imBBox,
+		# 							"bbox_mode": BoxMode.XYWH_ABS,
+		# 							"category_id": 0})]
 		data.append(dat)
 	return data
 
@@ -66,11 +66,11 @@ https://colab.research.google.com/drive/16jcaJoc6bCFAQ96jDe2HwtXj7BMD_-m5#scroll
 """
 def detectron2(data, classes=classes):
 	dataset = DatasetFromList(data)
-	for d in dataset:
-		img = cv.imread(d["file_name"])
-		visualizer = Visualizer(img[:, :, ::-1], scale=0.5)
-		out = visualizer.draw_dataset_dict(d)
-		cv.imshow('window', out.get_image()[:, :, ::-1])
+	# for d in dataset:
+	# 	img = cv.imread(d["file_name"])
+	# 	visualizer = Visualizer(img[:, :, :-1], scale=0.5)
+	# 	out = visualizer.draw_dataset_dict(d)
+	# 	cv.imshow('window', out.get_image()[:, :, ::-1])
 
 
 """
@@ -164,24 +164,24 @@ https://www.tensorflow.org/tutorials/images/classification
 """
 def tensorflow(data, classes=classes):
 	data_dir = tf.keras.utils.image_dataset_from_directory(os.getcwd().replace("\\", "/") + "/" + data_path + "/data") #.get_file('agri', origin="https://www.kaggle.com/datasets/ravirajsinh45/crop-and-weed-detection-data-with-bounding-boxes/download", untar=True)  # "file:///" + os.getcwd().replace("\\", "/") + "/" + data_path + "/data")
-	data_dir = pathlib.Path(data_dir)
-	image_count = len(list(data_dir.glob('*.jpeg')))
+	#data_dir = pathlib.Path(data_dir)
+	#image_count = len(list(data_dir.glob('*.jpeg')))
 
 	train_ds = tf.keras.utils.image_dataset_from_directory(
-		data_dir,
+		os.getcwd().replace("\\", "/") + "/" + data_path + "/data",
 		validation_split=0.2,
 		subset="training",
 		seed=123,
 		image_size=(512, 512),
 		batch_size=10)
 	val_ds = tf.keras.utils.image_dataset_from_directory(
-		data_dir,
+		os.getcwd().replace("\\", "/") + "/" + data_path + "/data",
 		validation_split=0.2,
 		subset="validation",
 		seed=123,
 		image_size=(512, 512),
 		batch_size=10)
-	train_ds.class_names = classes
+	#train_ds.class_names = classes
 
 	AUTOTUNE = tf.data.AUTOTUNE
 	train_ds = train_ds.cache().shuffle(1000).prefetch(buffer_size=AUTOTUNE)
@@ -208,20 +208,22 @@ def tensorflow(data, classes=classes):
 				  metrics=['accuracy'])
 	model.summary()
 
-	epochs = 10
+	epochs = 4
 	history = model.fit(
 		train_ds,
 		validation_data=val_ds,
 		epochs=epochs
 	)
 
-	img = tf.keras.utils.load_img(os.getcwd() + "\\" + data_path + "\\predict", target_size=(512, 512))
-	img_array = tf.keras.utils.img_to_array(img)
-	img_array = tf.expand_dims(img_array, 0)  # Create a batch
-
-	predictions = model.predict(img_array)
-	score = tf.nn.softmax(predictions[0])
-	print(score)
+	predict_dir = os.getcwd().replace("\\", "/") + "/" + data_path + "/predict"
+	predictions = []
+	for im in os.listdir(predict_dir):
+		if not im.endswith(".jpeg"): continue
+		img = tf.keras.utils.load_img(predict_dir + "/" + im, target_size=(512, 512))
+		img_array = tf.keras.utils.img_to_array(img)
+		img_array = tf.expand_dims(img_array, 0)  # Create a batch
+		prediction = model.predict(img_array)
+		print(classes[np.argmax(tf.nn.softmax(prediction[0]))], 100 * np.max(tf.nn.softmax(prediction[0])))
 
 
 # Preliminary
